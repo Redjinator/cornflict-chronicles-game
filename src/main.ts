@@ -1,27 +1,78 @@
-import { Application, Sprite, Texture, Assets, TilingSprite } from "pixi.js";
-import Player from "./entities/player";
+import { Application, Container, Texture, Sprite,  Assets, TilingSprite } from "pixi.js";
+import Player, { setupKeyboard } from "./entities/player";
+import { createBackground } from "./helpers/createBackground";
+
 
 // Canvas Setup
 const app = new Application<HTMLCanvasElement>({background: '0x1099bb'});
 document.body.appendChild(app.view);
-const { width, height } = app.view;
+
+
 
 Assets.add('ground', '/assets/images/ground.jpg');
+const groundTexture = await Assets.load('/assets/images/ground.jpg')
+Assets.add('heart', '/assets/images/heart.png')
+//
+
+// Variables
+let player: Player;
 
 
-async function init() {
-  // Tiling Background
-  const textureGround: Texture = await Assets.load('/assets/images/ground.jpg');
-  let tilingSprite: TilingSprite = new TilingSprite(textureGround, width, height);
-  tilingSprite.position.set(0, 0);
-  app.stage.addChild(tilingSprite);
+let bg1: any = new Sprite(groundTexture);
+let bg2: any = new Sprite(groundTexture);
 
-  // Player
-  const player = new Player(app);
+bg1.x = 0;
+bg2.x = bg1.width;
 
-}
+app.stage.addChild(bg1);
+app.stage.addChild(bg2);
 
-init();
+let speed = 5;
+
+app.ticker.add(() => {
+  if (player.vx < 0) {
+    bg1.x += speed;
+    bg2.x += speed;
+  } else if (player.vx > 0) {
+    bg1.x -= speed;
+    bg2.x -= speed;
+  }
+
+  if (player.vy < 0) {
+    bg1.y += speed;
+    bg2.y += speed;
+  } else if (player.vy > 0) {
+    bg1.y -= speed;
+    bg2.y -= speed;
+  }
+
+  if (bg1.x + bg1.width < 0) {
+    bg1.x = bg2.x + bg2.width;
+  } else if (bg2.x + bg2.width < 0) {
+    bg2.x = bg1.x + bg1.width;
+  }
+
+  // Similarly for vertical repositioning
+if (bg1.y + bg1.height < 0) {
+    bg1.y = bg2.y + bg2.height;
+  } else if (bg2.y + bg2.height < 0) {
+    bg2.y = bg1.y + bg1.height;
+  }
+
+  if (bg1.y > app.screen.height) {
+    bg1.y = bg2.y - bg2.height;
+  } else if (bg2.y > app.screen.height) {
+    bg2.y = bg1.y - bg1.height;
+  }
+
+});
+
+
+
+
+// Player
+player = createPlayer();
+app.stage.addChild(player);
 
 
 
@@ -29,38 +80,43 @@ init();
 
 
 
-
-
-
-
-
-
-
-
-
+// SETUP
 export function setup() {
   app.ticker.add((delta) => gameLoop(delta));
+  play(2);
 }
 
+
+
+// GAME LOOP
 function gameLoop(delta: number) {
-  // Update the current game state:
-  // state(delta);
+  while (true) {
+    play(delta);
+    console.log('gameLoop')
+  }
 }
 
-function play(delta: number) {
-  // TODO: Add play logic
+function play(delta: any) {
 
-  // TODO: Add farmer
+  const playerDelta = (delta = {
+    x: player.vx * delta,
+    y: player.vy * delta
+  });
 
-}
+  // Moves the background based on player movement
+  
 
-
-function endGame() {
-  // TODO: Add end game logic
-
-}
-
-function startGame() {
+  console.log('play');
 
 }
 
+
+
+
+
+
+function createPlayer() {
+  const player = new Player(app);
+  setupKeyboard(player);
+  return player;
+}
