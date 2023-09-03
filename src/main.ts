@@ -4,7 +4,11 @@ import { createBackground } from "./helpers/createBackground";
 
 
 // Canvas Setup
-const app = new Application<HTMLCanvasElement>({background: '0x1099bb'});
+const app = new Application<HTMLCanvasElement>({
+  background: '0x1099bb',
+  width: 1200,
+  height: 800,
+});
 document.body.appendChild(app.view);
 
 

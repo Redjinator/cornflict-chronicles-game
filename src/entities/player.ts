@@ -1,25 +1,18 @@
-import { Container, Assets, Sprite, Application } from 'pixi.js';
+import { Container, Assets, AnimatedSprite, Application, Texture } from 'pixi.js';
+import CustomAnimation from '../helpers/customAnimation';
 
 export default class Player extends Container {
   public vx: number = 0;
   public vy: number = 0;
   public sprite: any;
-  
-
 
   constructor(app: Application) {
     super();
-    this.x = app.view.width / 2;
-    this.y = app.view.height / 2;
-    
 
-    // Initialize Player
-    Assets.load('/assets/images/heart.png').then((resolveTexture) => {
-      this.sprite = Sprite.from(resolveTexture);
-      this.sprite.anchor.set(0.5);
-      this.addChild(this.sprite);
-      app.stage.addChild(this);
+    CustomAnimation.create(app, '/public/assets/images/farmer_idle.json', 'idle_0').then((idleAnim) => {
+      idleAnim.playAnimation(0.5);
     });
+
   }
 }
 
